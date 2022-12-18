@@ -7,8 +7,8 @@ public interface CredentialsService {
 
     <T> T get(Class<T> t);
 
-    void saveCredentials(SpotifyCredentials credentials);
+    void save(SpotifyCredentials credentials);
 
-    void saveCredentials(DiscordCredentials credentials);
+    void save(DiscordCredentials credentials);
 
 }
