@@ -18,7 +18,7 @@ public class DiscordCredentials {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    String discordSelfId;
+    Long discordSelfId;
 
     @NotBlank
     String token;

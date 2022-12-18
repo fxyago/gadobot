@@ -31,12 +31,12 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     @Override
-    public void saveCredentials(SpotifyCredentials credentials) {
+    public void save(SpotifyCredentials credentials) {
         spotifyRepository.save(credentials);
     }
 
     @Override
-    public void saveCredentials(DiscordCredentials credentials) {
+    public void save(DiscordCredentials credentials) {
         discordRepository.save(credentials);
     }
 

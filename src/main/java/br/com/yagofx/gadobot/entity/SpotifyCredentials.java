@@ -27,8 +27,10 @@ public class SpotifyCredentials {
     @NotBlank
     String redirectUrl;
 
+    @NotBlank
     String accessToken;
 
+    @NotBlank
     String refreshToken;
 
 }
