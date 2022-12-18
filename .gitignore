@@ -37,3 +37,4 @@ build/
 
 ### Local Configuration ###
 .env
+**/*.log
