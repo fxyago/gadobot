@@ -4,15 +4,15 @@ import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface SpotifyService {
 
-    boolean refreshToken();
+    void refreshToken();
 
-    Optional<Track> getTrack(String url);
+    CompletableFuture<Track> getTrack(String url);
 
-    Optional<Album> getAlbum(String url);
+    CompletableFuture<Album> getAlbum(String url);
 
-    Optional<Playlist> getPlaylist(String url);
+    CompletableFuture<Playlist> getPlaylist(String url);
 }
