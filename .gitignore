@@ -35,5 +35,5 @@ build/
 .DS_Store
 /.idea/
 
-#### Local Configuration ###
-#.env
+### Local Configuration ###
+.env
