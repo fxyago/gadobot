@@ -7,6 +7,7 @@ import br.com.yagofx.gadobot.listener.GuildListener;
 import br.com.yagofx.gadobot.service.CredentialsService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -66,7 +67,10 @@ public class BeanFactory {
 
     @Bean
     public AudioPlayerManager playerManager() {
-        return new DefaultAudioPlayerManager();
+        final DefaultAudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+        AudioSourceManagers.registerLocalSource(playerManager);
+        AudioSourceManagers.registerRemoteSources(playerManager);
+        return playerManager;
     }
 
 }
