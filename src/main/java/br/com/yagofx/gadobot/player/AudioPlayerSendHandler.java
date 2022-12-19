@@ -3,7 +3,6 @@ package br.com.yagofx.gadobot.player;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -26,7 +25,6 @@ public class AudioPlayerSendHandler implements AudioSendHandler {
         return audioPlayer.provide(frame);
     }
 
-    @Nullable
     @Override
     public ByteBuffer provide20MsAudio() {
         ((Buffer) buffer).flip();

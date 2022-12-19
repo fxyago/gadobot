@@ -20,4 +20,9 @@ public class AudioTrackWrapper {
         this.member = member;
         this.songName = songName;
     }
+
+    public AudioTrackWrapper(AudioTrack track, Member member, String songName) {
+        this(member, songName);
+        this.track = track;
+    }
 }
