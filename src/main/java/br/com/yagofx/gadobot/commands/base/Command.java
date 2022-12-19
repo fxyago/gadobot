@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface Command {
 
-    List<String> getAliases();
+    default List<String> getAliases() {
+        return List.of(this.getClass().getSimpleName().toLowerCase());
+    }
 
     Void run(Event event);
 
