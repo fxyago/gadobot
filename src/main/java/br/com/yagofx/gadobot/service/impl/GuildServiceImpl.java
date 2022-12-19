@@ -6,6 +6,8 @@ import br.com.yagofx.gadobot.repository.GuildPreferencesRepository;
 import br.com.yagofx.gadobot.service.GuildService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -43,6 +45,20 @@ public class GuildServiceImpl implements GuildService {
         GuildPreferences newPreferences = new GuildPreferences(guildId);
         repository.save(newPreferences);
         return newPreferences.getPrefix();
+    }
+
+    @Override
+    public boolean connectToVoiceChannel(Guild guild, Member member) {
+        var audioManager = guild.getAudioManager();
+        if (audioManager.isConnected()) return true;
+
+        for (VoiceChannel vc : audioManager.getGuild().getVoiceChannels()) {
+            if (vc.getMembers().contains(member)) {
+                audioManager.openAudioConnection(vc);
+                return true;
+            }
+        }
+        return false;
     }
 
     private GuildMusicManager getMusicManager(Long guildId) {

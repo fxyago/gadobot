@@ -1,15 +1,20 @@
 package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import br.com.yagofx.gadobot.service.GuildService;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
-@Component
 public class Summon extends AbstractCommand {
+
+    private final GuildService service;
+
+    public Summon(@Qualifier("GuildServiceImpl") GuildService service) {
+        this.service = service;
+    }
 
     @Override
     public List<String> getAliases() {
@@ -20,25 +25,12 @@ public class Summon extends AbstractCommand {
     public Void run(Event event) {
         var messageEvent = (MessageReceivedEvent) event;
 
-        var audioManager = messageEvent.getGuild().getAudioManager();
-        if (audioManager.isConnected()) return null;
-
-        if (!connectOnVoiceChannel(messageEvent))
+        if (!service.connectToVoiceChannel(messageEvent.getGuild(), messageEvent.getMember()))
             messageEvent.getChannel().sendMessage("Entra numa sala primeiro krl").queue();
 
         return null;
     }
 
-    private boolean connectOnVoiceChannel(MessageReceivedEvent messageEvent) {
-        var audioManager = messageEvent.getGuild().getAudioManager();
 
-        for (VoiceChannel vc : audioManager.getGuild().getVoiceChannels()) {
-            if (vc.getMembers().contains(messageEvent.getMember())) {
-                audioManager.openAudioConnection(vc);
-                return true;
-            }
-        }
-        return false;
-    }
 
 }
