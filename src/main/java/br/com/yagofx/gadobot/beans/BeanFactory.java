@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import se.michaelthelin.spotify.SpotifyApi;
 
 import java.util.EnumSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
@@ -55,6 +57,11 @@ public class BeanFactory {
                 .setClientSecret(creds.getClientSecret())
                 .setRefreshToken(creds.getRefreshToken())
                 .build();
+    }
+
+    @Bean
+    public ExecutorService executorService() {
+        return Executors.newFixedThreadPool(4);
     }
 
     @Bean
