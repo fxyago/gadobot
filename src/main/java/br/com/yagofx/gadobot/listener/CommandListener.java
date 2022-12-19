@@ -32,19 +32,24 @@ public class CommandListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
-        if (isMensagemPrivada(event)) return;
-        executarComando(event);
+        if (isPrivateMessate(event)) return;
+        executeCommandOf(event);
     }
 
-    private void executarComando(@NotNull MessageReceivedEvent event) {
+    private void executeCommandOf(@NotNull MessageReceivedEvent event) {
         String prefix = guildService.getPrefix(event.getGuild().getId()).toString();
 
         if (event.getMessage().getContentRaw().startsWith(prefix)) {
-            commandMap.get(ParsingUtils.parseCommand(event.getMessage().getContentRaw())).apply(event);
+            Function<Event, Void> commandFunction = commandMap.get(ParsingUtils.extractCommandFrom(event.getMessage().getContentRaw()));
+            if (commandFunction == null) {
+                event.getChannel().sendMessage("N tem esse comando ai n feio");
+                return;
+            }
+            commandFunction.apply(event);
         }
     }
 
-    private boolean isMensagemPrivada(@NotNull MessageReceivedEvent event) {
+    private boolean isPrivateMessate(@NotNull MessageReceivedEvent event) {
         if (event.isFromType(ChannelType.PRIVATE)) {
             respondPrivateMessage(event);
             return true;
@@ -58,7 +63,7 @@ public class CommandListener extends ListenerAdapter {
     }
 
     public void addCommand(AbstractCommand abstractCommand) {
-        log.error("Adicionando comando: " + abstractCommand.getName());
+        log.info("Adicionando comando: " + abstractCommand.getName());
         abstractCommand.getAliases().forEach(s -> {
             commandMap.put(s, abstractCommand::run);
         });
