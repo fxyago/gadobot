@@ -54,6 +54,7 @@ public class GuildServiceImpl implements GuildService {
 
         for (VoiceChannel vc : audioManager.getGuild().getVoiceChannels()) {
             if (vc.getMembers().contains(member)) {
+                audioManager.setSelfDeafened(true);
                 audioManager.openAudioConnection(vc);
                 return true;
             }
