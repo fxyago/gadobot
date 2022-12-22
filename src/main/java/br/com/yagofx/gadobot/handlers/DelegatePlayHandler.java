@@ -24,7 +24,7 @@ public class DelegatePlayHandler {
 
     public DelegatePlayHandler(
             @Qualifier("GuildServiceImpl") GuildService guildService,
-            @Qualifier("youtubeServiceProxy") YoutubeService youtubeService,
+            @Qualifier("YoutubeServiceProxy") YoutubeService youtubeService,
             SpotifyHandler spotifyHandler) {
         this.guildService = guildService;
         this.spotifyHandler = spotifyHandler;

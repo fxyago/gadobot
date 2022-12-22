@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
 @Slf4j
-@Service
+@Service("YoutubeServiceProxy")
 public class YoutubeServiceProxy implements YoutubeService {
 
     private final AudioPlayerManager playerManager;
@@ -68,7 +68,7 @@ public class YoutubeServiceProxy implements YoutubeService {
             playerManager.loadItem(url, new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(AudioTrack track) {
-                    throw new RuntimeException("Now allowed");
+                    throw new RuntimeException("Not allowed");
                 }
 
                 @Override
