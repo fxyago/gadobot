@@ -5,8 +5,8 @@ import br.com.yagofx.gadobot.service.GuildService;
 import br.com.yagofx.gadobot.service.YoutubeService;
 import br.com.yagofx.gadobot.util.ParsingUtils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -37,17 +37,24 @@ public class DelegatePlayHandler {
 
         try {
             processTrackResults(event, args, tracks);
-            queue(tracks, event.getGuild(), event.getMember());
+            queue(tracks, event);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    private void queue(List<AudioTrackWrapper> tracks, Guild guild, Member member) {
+    private void queue(List<AudioTrackWrapper> tracks, Event event) {
+        MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
+
         if (!tracks.isEmpty()) {
-            guildService.connectToVoiceChannel(guild, member);
-            guildService.getGuildAudioPlayer(guild).getScheduler().queueAll(tracks);
+            if (guildService.connectToVoiceChannel(messageEvent.getGuild(), messageEvent.getMember())) {
+                messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder()
+                        .setAuthor("Adicionando à fila:")
+                        .setTitle(tracks.size() == 1 ? tracks.get(0).getSongName() : tracks.size() + " músicas")
+                        .build()).queue();
+                guildService.getGuildAudioPlayer(messageEvent.getGuild()).getScheduler().queueAll(tracks);
+            }
         }
     }
 
