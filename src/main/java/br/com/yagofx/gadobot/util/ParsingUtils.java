@@ -20,11 +20,11 @@ public class ParsingUtils {
     }
 
     public static String formatSpotifyItem(Track track) {
-        return String.format("%s - %s", track.getArtists()[0], track.getName());
+        return String.format("%s - %s", track.getArtists()[0].getName(), track.getName());
     }
 
     public static String formatSpotifyItem(TrackSimplified track) {
-        return String.format("%s - %s", track.getArtists()[0], track.getName());
+        return String.format("%s - %s", track.getArtists()[0].getName(), track.getName());
     }
 
     public static String formatCommandAliases(List<String> aliases) {
