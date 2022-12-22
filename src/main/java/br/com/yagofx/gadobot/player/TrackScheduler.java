@@ -1,16 +1,20 @@
 package br.com.yagofx.gadobot.player;
 
+import br.com.yagofx.gadobot.commands.Repeat;
+import br.com.yagofx.gadobot.service.YoutubeService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lombok.AccessLevel;
-import lombok.Setter;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,52 +22,92 @@ import java.util.concurrent.LinkedBlockingQueue;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TrackScheduler extends AudioEventAdapter {
 
-    @Setter
-    private AudioPlayerManager playerManager;
+    @Getter
+    AudioTrackWrapper nowPlaying;
 
-    private final AudioPlayer audioPlayer;
-    private final LinkedBlockingQueue<AudioTrackWrapper> queue;
+    Repeat.LEVEL repeat;
 
-    public TrackScheduler(AudioPlayer audioPlayer) {
+    final YoutubeService youtubeService;
+
+    final AudioPlayer audioPlayer;
+
+    @Getter
+    final LinkedBlockingQueue<AudioTrackWrapper> queue;
+
+    @Getter
+    final LinkedList<AudioTrackWrapper> history;
+
+    public TrackScheduler(YoutubeService youtubeService, AudioPlayer audioPlayer) {
+        this.youtubeService = youtubeService;
         this.audioPlayer = audioPlayer;
+        this.history = new LinkedList<>();
         this.queue = new LinkedBlockingQueue<>();
+        this.nowPlaying = null;
+        this.repeat = Repeat.LEVEL.NONE;
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        history.add(0, nowPlaying);
         if (endReason.mayStartNext) nextTrack();
     }
 
     private void nextTrack() {
-        AudioTrackWrapper nextTrack = queue.peek();
-        if (nextTrack != null && nextTrack.getTrack() != null) {
-            queue.remove(nextTrack);
-            audioPlayer.startTrack(nextTrack.getTrack(), false);
-        }
+        if (repeat == Repeat.LEVEL.SINGLE) audioPlayer.startTrack(nowPlaying.getTrack(), true);
+
+        AudioTrackWrapper nextTrack = queue.poll();
+
+        if (nextTrack == null) return;
+        if (nextTrack.getTrack() == null) nextTrack.setTrack(youtubeService.getTrackFrom(nextTrack.getSongName()));
+
+        if (repeat == Repeat.LEVEL.ALL) queue.offer(nextTrack);
+
+        nowPlaying = nextTrack;
+        audioPlayer.startTrack(nextTrack.getTrack(), true);
     }
 
-    public synchronized void queue(AudioTrackWrapper track) {
-        queue.offer(track);
+    public synchronized void queue(AudioTrackWrapper newTrack) {
+        if (queue.isEmpty()) {
+            nowPlaying = newTrack;
+            audioPlayer.startTrack(newTrack.getTrack(), true);
+        }
+        queue.offer(newTrack);
     }
 
     public synchronized void queueAll(List<AudioTrackWrapper> tracks) {
-        System.out.println("Adding " + tracks.toString());
+        System.out.println("Adding " + tracks.size() + " tracks to the queue");
         queue.addAll(tracks);
-        System.out.println(audioPlayer.getPlayingTrack());
         if (audioPlayer.getPlayingTrack() == null) nextTrack();
+    }
+
+    public void shuffle() {
+        List<AudioTrackWrapper> tempList = new ArrayList<>(this.queue);
+        Collections.shuffle(tempList);
+        queue.clear();
+        queue.addAll(tempList);
     }
 
     public void clearQueue() {
         this.queue.clear();
     }
 
-    public void nowPlaying() {
-        String title = this.audioPlayer.getPlayingTrack().getInfo().title;
-        System.out.println("Ta tocando esse treco aqui ó: " + title);
+    public Repeat.LEVEL toggleRepeat(String args) {
+        if (args != null) {
+            Repeat.LEVEL level = Repeat.LEVEL.valueOf(args);
+            this.repeat = level;
+        } else {
+            switch (repeat) {
+                case SINGLE -> repeat = Repeat.LEVEL.ALL;
+                case ALL -> repeat = Repeat.LEVEL.NONE;
+                case NONE -> repeat = Repeat.LEVEL.SINGLE;
+            }
+        }
+        return repeat;
     }
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         log.error(exception.getLocalizedMessage());
     }
+
 }
