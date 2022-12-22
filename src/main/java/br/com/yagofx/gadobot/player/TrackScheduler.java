@@ -52,7 +52,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (endReason.mayStartNext) nextTrack();
     }
 
-    private void nextTrack() {
+    public void nextTrack() {
         if (repeat == Repeat.LEVEL.SINGLE) audioPlayer.startTrack(nowPlaying.getTrack(), true);
 
         AudioTrackWrapper nextTrack = queue.poll();
@@ -75,7 +75,7 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public synchronized void queueAll(List<AudioTrackWrapper> tracks) {
-        System.out.println("Adding " + tracks.size() + " tracks to the queue");
+        log.debug("Adding " + tracks.size() + " tracks to the queue");
         queue.addAll(tracks);
         if (audioPlayer.getPlayingTrack() == null) nextTrack();
     }
@@ -88,13 +88,13 @@ public class TrackScheduler extends AudioEventAdapter {
     }
 
     public void clearQueue() {
-        this.queue.clear();
+        queue.clear();
+        stop();
     }
 
     public Repeat.LEVEL toggleRepeat(String args) {
         if (args != null) {
-            Repeat.LEVEL level = Repeat.LEVEL.valueOf(args);
-            this.repeat = level;
+            this.repeat = Repeat.LEVEL.valueOf(args);
         } else {
             switch (repeat) {
                 case SINGLE -> repeat = Repeat.LEVEL.ALL;
@@ -110,4 +110,24 @@ public class TrackScheduler extends AudioEventAdapter {
         log.error(exception.getLocalizedMessage());
     }
 
+    public void stop() {
+        audioPlayer.stopTrack();
+    }
+
+    public void togglePause() {
+        audioPlayer.setPaused(!audioPlayer.isPaused());
+    }
+
+    public boolean isPaused() {
+        return audioPlayer.isPaused();
+    }
+
+    public void move(Integer fromPosition, Integer toPosition) {
+        ArrayList<AudioTrackWrapper> tracks = new ArrayList<>();
+        queue.drainTo(tracks);
+        AudioTrackWrapper trackToMove = tracks.get(fromPosition - 1);
+        tracks.remove(trackToMove);
+        tracks.add(toPosition - 1, trackToMove);
+        queue.addAll(tracks);
+    }
 }
