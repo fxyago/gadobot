@@ -13,8 +13,13 @@ public class Jump extends AbstractCommand {
     }
 
     @Override
-    public Void run(Event event) {
-        return null;
+    public void run(Event event) {
+
+    }
+
+    @Override
+    public String helpDescription() {
+        return "*Pula varias musicas da lista ate chegar no numero recebido";
     }
 
 }

@@ -22,15 +22,18 @@ public class Summon extends AbstractCommand {
     }
 
     @Override
-    public Void run(Event event) {
+    public void run(Event event) {
         var messageEvent = (MessageReceivedEvent) event;
 
         if (!service.connectToVoiceChannel(messageEvent.getGuild(), messageEvent.getMember()))
             messageEvent.getChannel().sendMessage("Entra numa sala primeiro krl").queue();
 
-        return null;
     }
 
+    @Override
+    public String helpDescription() {
+        return "*Chama o bot para a sua sala de voz\n*Só funciona se voce estiver em uma sala de voz (obviamente)";
+    }
 
 
 }

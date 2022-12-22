@@ -13,8 +13,12 @@ public class Skip extends AbstractCommand {
     }
 
     @Override
-    public Void run(Event event) {
-        return null;
+    public void run(Event event) {
+    }
+
+    @Override
+    public String helpDescription() {
+        return "*Pula para a próxima música da fila\n*Para o player caso a fila esteja vazia";
     }
 
 }

@@ -13,7 +13,11 @@ public class Queue extends AbstractCommand {
     }
 
     @Override
-    public Void run(Event event) {
-        return null;
+    public void run(Event event) {
+    }
+
+    @Override
+    public String helpDescription() {
+        return "*Mostra a fila de músicas em uma lista";
     }
 }

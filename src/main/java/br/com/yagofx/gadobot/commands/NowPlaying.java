@@ -13,7 +13,11 @@ public class NowPlaying extends AbstractCommand {
     }
 
     @Override
-    public Void run(Event event) {
-        return null;
+    public void run(Event event) {
+    }
+
+    @Override
+    public String helpDescription() {
+        return "*Mostra detalhes sobre a música que esta tocando no momento";
     }
 }
