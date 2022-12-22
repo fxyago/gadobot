@@ -3,6 +3,8 @@ package br.com.yagofx.gadobot.util;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
+import java.util.List;
+
 public class ParsingUtils {
 
     public static String extractCommandFrom(String message) {
@@ -23,6 +25,12 @@ public class ParsingUtils {
 
     public static String formatSpotifyItem(TrackSimplified track) {
         return String.format("%s - %s", track.getArtists()[0], track.getName());
+    }
+
+    public static String formatCommandAliases(List<String> aliases) {
+        StringBuilder sb = new StringBuilder();
+        aliases.forEach(a -> sb.append(String.format("`%s` ", a)));
+        return sb.toString().trim();
     }
 
 }
