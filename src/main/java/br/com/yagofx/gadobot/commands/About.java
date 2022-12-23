@@ -1,7 +1,7 @@
 package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
-import net.dv8tion.jda.api.EmbedBuilder;
+import br.com.yagofx.gadobot.util.SimpleEmbeds;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,25 +9,21 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class About extends AbstractCommand {
 
-    private final String name;
-    private final String version;
+    private final String aboutTitle;
+    private final String aboutBody;
 
     public About(
-            @Value("${application.name}") String name,
-            @Value("${build.version}") String version) {
-        this.name = name;
-        this.version = version;
+            @Value("${about.title}") String aboutTitle,
+            @Value("${about.body}") String aboutBody) {
+        this.aboutTitle = aboutTitle;
+        this.aboutBody = aboutBody;
     }
 
     @Override
     public void run(Event event) {
         MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
-        MessageEmbed embed = new EmbedBuilder()
-                .setTitle(String.format("%s v%s", name, version))
-                .setDescription("\u00AD\nPerguntas, sugestões ou suporte técnico:\n\n[GitHub](https://github.com/fxyago/gadobot)\n[Twitter](https://www.twitter.com/fxyago)\n\u00AD")
-                .setFooter("Feito por yago#5476")
-                .build();
-        messageEvent.getChannel().sendMessageEmbeds(embed).queue();
+        MessageEmbed aboutEmbed = SimpleEmbeds.about(aboutTitle, aboutBody).build();
+        messageEvent.getChannel().sendMessageEmbeds(aboutEmbed).queue();
     }
 
     @Override
