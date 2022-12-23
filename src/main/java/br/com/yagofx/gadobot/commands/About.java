@@ -24,7 +24,7 @@ public class About extends AbstractCommand {
         MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle(String.format("%s v%s", name, version))
-                .setDescription("\u00AD\nLinks uteis:\n\n[GitHub](https://github.com/fxyago/gadobot)\n[Twitter](https://www.twitter.com/fxyago)\n\u00AD")
+                .setDescription("\u00AD\nPerguntas, sugestões ou suporte técnico:\n\n[GitHub](https://github.com/fxyago/gadobot)\n[Twitter](https://www.twitter.com/fxyago)\n\u00AD")
                 .setFooter("Feito por yago#5476")
                 .build();
         messageEvent.getChannel().sendMessageEmbeds(embed).queue();
