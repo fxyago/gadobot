@@ -20,8 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import se.michaelthelin.spotify.SpotifyApi;
 
 import java.util.EnumSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
@@ -63,14 +61,9 @@ public class BeanFactory {
     }
 
     @Bean
-    public ExecutorService executorService() {
-        return Executors.newFixedThreadPool(4);
-    }
-
-    @Bean
     public AudioPlayerManager playerManager(
-            @Value("${youtube.email}") String email,
-            @Value("${youtube.password}") String password
+            @Value("${youtube.email:}") String email,
+            @Value("${youtube.password: }") String password
     ) {
         final DefaultAudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerLocalSource(playerManager);
