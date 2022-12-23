@@ -1,5 +1,6 @@
 package br.com.yagofx.gadobot.player;
 
+import br.com.yagofx.gadobot.commands.Leave;
 import br.com.yagofx.gadobot.commands.Repeat;
 import br.com.yagofx.gadobot.service.YoutubeService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -14,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
+import java.util.function.Function;
+
+import static br.com.yagofx.gadobot.commands.Leave.Reason.*;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -31,42 +34,53 @@ public class TrackScheduler extends AudioEventAdapter {
 
     final AudioPlayer audioPlayer;
 
-    @Getter
     final LinkedBlockingQueue<AudioTrackWrapper> queue;
+    final LinkedBlockingDeque<AudioTrackWrapper> history;
 
-    @Getter
-    final LinkedList<AudioTrackWrapper> history;
+    final ScheduledExecutorService executor;
+    Function<Leave.Reason, Void> callback;
+    Future<?> disconnectTask;
 
     public TrackScheduler(YoutubeService youtubeService, AudioPlayer audioPlayer) {
         this.youtubeService = youtubeService;
         this.audioPlayer = audioPlayer;
-        this.history = new LinkedList<>();
+        this.history = new LinkedBlockingDeque<>();
         this.queue = new LinkedBlockingQueue<>();
         this.nowPlaying = null;
         this.repeat = Repeat.LEVEL.NONE;
+        this.executor = Executors.newSingleThreadScheduledExecutor();
+        this.disconnectTask = null;
+        this.callback = null;
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        history.add(0, nowPlaying);
+        if (nowPlaying != null)
+            history.offerFirst(nowPlaying);
         if (endReason.mayStartNext) nextTrack();
     }
 
     public void nextTrack() {
-        if (repeat == Repeat.LEVEL.SINGLE) audioPlayer.startTrack(nowPlaying.getTrack(), true);
+        if (repeat == Repeat.LEVEL.SINGLE) {
+            nowPlaying.setTrack(nowPlaying.getTrack().makeClone());
+            audioPlayer.startTrack(nowPlaying.getTrack(), false);
+        }
 
         AudioTrackWrapper nextTrack = queue.poll();
 
-        if (nextTrack == null) return;
+        nowPlaying = nextTrack;
+        if (nextTrack == null)  {
+            startTimer(QUEUE_END);
+            return;
+        }
         if (nextTrack.getTrack() == null) nextTrack.setTrack(youtubeService.getTrackFrom(nextTrack.getSongName()));
-
         if (repeat == Repeat.LEVEL.ALL) queue.offer(nextTrack);
 
-        nowPlaying = nextTrack;
         audioPlayer.startTrack(nextTrack.getTrack(), true);
     }
 
     public synchronized void queue(AudioTrackWrapper newTrack) {
+        stopTimer();
         if (queue.isEmpty()) {
             nowPlaying = newTrack;
             audioPlayer.startTrack(newTrack.getTrack(), true);
@@ -89,7 +103,6 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public void clearQueue() {
         queue.clear();
-        stop();
     }
 
     public Repeat.LEVEL toggleRepeat(String args) {
@@ -112,6 +125,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public void stop() {
         audioPlayer.stopTrack();
+        startTimer(STOP);
     }
 
     public void togglePause() {
@@ -122,6 +136,20 @@ public class TrackScheduler extends AudioEventAdapter {
         return audioPlayer.isPaused();
     }
 
+    @Override
+    public void onPlayerPause(AudioPlayer player) {
+        startTimer(PAUSE);
+    }
+
+    @Override
+    public void onPlayerResume(AudioPlayer player) {
+        stopTimer();
+    }
+
+    public void setVolume(int volume) {
+        this.audioPlayer.setVolume(volume);
+    }
+
     public void move(Integer fromPosition, Integer toPosition) {
         ArrayList<AudioTrackWrapper> tracks = new ArrayList<>();
         queue.drainTo(tracks);
@@ -129,5 +157,36 @@ public class TrackScheduler extends AudioEventAdapter {
         tracks.remove(trackToMove);
         tracks.add(toPosition - 1, trackToMove);
         queue.addAll(tracks);
+    }
+
+    public void dispose() {
+        this.queue.clear();
+        this.audioPlayer.stopTrack();
+        this.nowPlaying = null;
+    }
+
+    public void setCallback(Function<Leave.Reason, Void> callback) {
+        this.callback = callback;
+    }
+
+    public void timerOverride(Leave.Reason reason) {
+        stopTimer();
+        if (reason == null) return;
+
+        startTimer(reason);
+    }
+
+    private void startTimer(Leave.Reason reason) {
+        this.disconnectTask = executor.schedule(() -> callback.apply(reason), 5, TimeUnit.MINUTES);
+    }
+
+    private void stopTimer() {
+        if (disconnectTask != null && !disconnectTask.isCancelled()) {
+            disconnectTask.cancel(false);
+        }
+    }
+
+    public Integer getVolume() {
+        return audioPlayer.getVolume();
     }
 }
