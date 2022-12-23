@@ -2,7 +2,7 @@ package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import br.com.yagofx.gadobot.util.CommonEmojis;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +29,7 @@ public class Pause extends AbstractCommand {
         var messageEvent = (MessageReceivedEvent) event;
         var scheduler = guildService.getTrackScheduler(messageEvent.getGuild());
         boolean paused = scheduler.isPaused();
-        messageEvent.getMessage().addReaction(Emoji.fromUnicode(paused ? "U+25B6" : "U+23F8")).queue();
+        messageEvent.getMessage().addReaction(paused ? CommonEmojis.PLAY : CommonEmojis.PAUSE).queue();
         scheduler.togglePause();
     }
 

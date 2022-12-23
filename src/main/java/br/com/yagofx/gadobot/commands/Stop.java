@@ -2,7 +2,7 @@ package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import br.com.yagofx.gadobot.util.CommonEmojis;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +20,7 @@ public class Stop extends AbstractCommand {
     @Override
     public void run(Event event) {
         MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
-        messageEvent.getMessage().addReaction(Emoji.fromUnicode("U+23F9")).queue();
+        messageEvent.getMessage().addReaction(CommonEmojis.STOP).queue();
         guildService.getTrackScheduler(messageEvent.getGuild()).stop();
     }
 

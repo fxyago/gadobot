@@ -2,8 +2,8 @@ package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
+import br.com.yagofx.gadobot.util.CommonEmojis;
 import br.com.yagofx.gadobot.util.ParsingUtils;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -33,7 +33,7 @@ public class Move extends AbstractCommand {
             Integer toPosition = Integer.parseInt(args[1].trim());
 
             guildService.getTrackScheduler(messageEvent.getGuild()).move(fromPosition, toPosition);
-            messageEvent.getMessage().addReaction(Emoji.fromUnicode("U+1F44D")).queue();
+            messageEvent.getMessage().addReaction(CommonEmojis.THUMBS_UP).queue();
         } catch (Exception e) {
             e.printStackTrace();
         }

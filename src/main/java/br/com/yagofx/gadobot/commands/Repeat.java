@@ -2,11 +2,13 @@ package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
+import br.com.yagofx.gadobot.util.CommonEmojis;
 import br.com.yagofx.gadobot.util.ParsingUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.List;
 
 public class Repeat extends AbstractCommand {
 
@@ -14,6 +16,11 @@ public class Repeat extends AbstractCommand {
 
     public Repeat(GuildService guildService) {
         this.guildService = guildService;
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("repeat", "loop");
     }
 
     @Override
@@ -25,7 +32,7 @@ public class Repeat extends AbstractCommand {
         } catch (IndexOutOfBoundsException ignored) {}
 
         LEVEL level = guildService.getTrackScheduler(messageEvent.getGuild()).toggleRepeat(args);
-        messageEvent.getMessage().addReaction(Emoji.fromUnicode("U+1F501")).queue();
+        messageEvent.getMessage().addReaction(CommonEmojis.REPEAT).queue();
         messageEvent.getChannel().sendMessageEmbeds(
                 new EmbedBuilder()
                     .setTitle("Repeat alterado para: " + level.name())
