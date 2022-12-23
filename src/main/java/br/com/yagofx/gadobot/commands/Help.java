@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Component("helpCommand")
+@Component("HelpCommand")
 public class Help extends AbstractCommand {
 
     @Override
