@@ -6,6 +6,7 @@ import br.com.yagofx.gadobot.service.YoutubeService;
 import br.com.yagofx.gadobot.util.ParsingUtils;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,13 +50,39 @@ public class DelegatePlayHandler {
 
         if (!tracks.isEmpty()) {
             if (guildService.connectToVoiceChannel(messageEvent.getGuild(), messageEvent.getMember())) {
-                messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setAuthor("Adicionando à fila:")
-                        .setTitle(tracks.size() == 1 ? tracks.get(0).getSongName() : tracks.size() + " músicas")
-                        .build()).queue();
-                guildService.getGuildAudioPlayer(messageEvent.getGuild()).getScheduler().queueAll(tracks);
+                messageEvent.getChannel().sendMessageEmbeds(formattedEmbedTitle(tracks)).queue();
+                var scheduler = guildService.getGuildAudioPlayer(messageEvent.getGuild()).getScheduler();
+                scheduler.queueAll(tracks);
+                scheduler.setCallback((reason) -> {
+
+                    String message = switch (reason) {
+                        case PAUSE -> "Tomei uma pausada por muuuuuito tempo, flw";
+                        case STOP -> "Tomei uma stopada por muuuuuito tempo, vlw fml";
+                        case QUEUE_END -> "Acabou a muuuusica, to vazando glr";
+                        case LEFT_ALONE -> "Fui embora pois me deixaram sozinho na sala, muuuuuu";
+                    };
+
+                    guildService.disconnect(messageEvent.getGuild());
+                    messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder().setDescription(message).build()).queue();
+                    return null;
+                });
             }
         }
+    }
+
+    private MessageEmbed formattedEmbedTitle(List<AudioTrackWrapper> tracks) {
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setAuthor("Adicionando à fila:");
+
+        if (tracks.size() == 1)
+            if (tracks.get(0).getTrack() != null)
+                embedBuilder.setTitle(tracks.get(0).getTrack().getInfo().title, tracks.get(0).getTrack().getInfo().uri);
+            else
+                embedBuilder.setTitle(tracks.get(0).getSongName());
+        else
+            embedBuilder.setTitle(tracks.size() + " músicas");
+
+        return embedBuilder.build();
     }
 
     private void processTrackResults(MessageReceivedEvent event, String args, List<AudioTrackWrapper> tracks) throws ExecutionException, InterruptedException {
