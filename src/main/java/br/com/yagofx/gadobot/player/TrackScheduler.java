@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static br.com.yagofx.gadobot.commands.Leave.Reason.*;
 
@@ -57,26 +58,26 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (nowPlaying != null)
             history.offerFirst(nowPlaying);
-        if (endReason.mayStartNext) nextTrack();
-    }
 
-    public void nextTrack() {
         if (repeat == Repeat.LEVEL.SINGLE) {
             nowPlaying.setTrack(nowPlaying.getTrack().makeClone());
             audioPlayer.startTrack(nowPlaying.getTrack(), false);
-        }
+        } else if (endReason.mayStartNext) nextTrack();
+    }
 
+    public void nextTrack() {
         AudioTrackWrapper nextTrack = queue.poll();
 
         nowPlaying = nextTrack;
         if (nextTrack == null)  {
+            audioPlayer.stopTrack();
             startTimer(QUEUE_END);
             return;
         }
         if (nextTrack.getTrack() == null) nextTrack.setTrack(youtubeService.getTrackFrom(nextTrack.getSongName()));
         if (repeat == Repeat.LEVEL.ALL) queue.offer(nextTrack);
 
-        audioPlayer.startTrack(nextTrack.getTrack(), true);
+        audioPlayer.startTrack(nextTrack.getTrack(), false);
     }
 
     public synchronized void queue(AudioTrackWrapper newTrack) {
@@ -188,5 +189,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public Integer getVolume() {
         return audioPlayer.getVolume();
+    }
+
+    public List<String> getTracklist() {
+        return this.queue.stream().map(AudioTrackWrapper::getSongName).collect(Collectors.toList());
     }
 }
