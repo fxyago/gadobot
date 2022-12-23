@@ -1,9 +1,10 @@
 package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
+import br.com.yagofx.gadobot.player.AudioTrackWrapper;
 import br.com.yagofx.gadobot.service.GuildService;
-import br.com.yagofx.gadobot.util.CommonEmojis;
 import br.com.yagofx.gadobot.util.ParsingUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -32,8 +33,12 @@ public class Move extends AbstractCommand {
             Integer fromPosition = Integer.parseInt(args[0].trim());
             Integer toPosition = Integer.parseInt(args[1].trim());
 
-            guildService.getTrackScheduler(messageEvent.getGuild()).move(fromPosition, toPosition);
-            messageEvent.getMessage().addReaction(CommonEmojis.THUMBS_UP).queue();
+            AudioTrackWrapper movedTrack = guildService.getTrackScheduler(messageEvent.getGuild()).move(fromPosition, toPosition);
+
+            messageEvent.getChannel().sendMessageEmbeds(new EmbedBuilder()
+                    .setTitle("Música: " + movedTrack.getSongName())
+                    .setDescription(String.format("Movido de posição %s para %s", fromPosition, toPosition))
+                    .build()).queue();
         } catch (Exception e) {
             e.printStackTrace();
         }

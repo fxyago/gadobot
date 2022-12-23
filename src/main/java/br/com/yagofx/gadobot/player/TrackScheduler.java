@@ -151,13 +151,14 @@ public class TrackScheduler extends AudioEventAdapter {
         this.audioPlayer.setVolume(volume);
     }
 
-    public void move(Integer fromPosition, Integer toPosition) {
+    public AudioTrackWrapper move(Integer fromPosition, Integer toPosition) {
         ArrayList<AudioTrackWrapper> tracks = new ArrayList<>();
         queue.drainTo(tracks);
         AudioTrackWrapper trackToMove = tracks.get(fromPosition - 1);
         tracks.remove(trackToMove);
         tracks.add(toPosition - 1, trackToMove);
         queue.addAll(tracks);
+        return trackToMove;
     }
 
     public void dispose() {
