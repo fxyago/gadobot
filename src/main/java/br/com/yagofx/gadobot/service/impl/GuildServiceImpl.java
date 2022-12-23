@@ -91,4 +91,10 @@ public class GuildServiceImpl implements GuildService {
         return musicManager;
     }
 
+    @Override
+    public void disconnect(Guild guild) {
+        var audioManager = guild.getAudioManager();
+        if (audioManager.isConnected()) audioManager.closeAudioConnection();
+    }
+
 }

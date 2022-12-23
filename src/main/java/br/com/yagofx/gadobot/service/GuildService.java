@@ -17,4 +17,5 @@ public interface GuildService {
 
     TrackScheduler getTrackScheduler(Guild guild);
 
+    void disconnect(Guild guild);
 }
