@@ -2,6 +2,7 @@ package br.com.yagofx.gadobot.commands;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
+import br.com.yagofx.gadobot.util.CommonEmojis;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,13 +27,21 @@ public class Leave extends AbstractCommand {
     @Override
     public void run(Event event) {
         var messageEvent = (MessageReceivedEvent) event;
+        messageEvent.getMessage().addReaction(CommonEmojis.THUMBS_UP).queue();
         messageEvent.getGuild().getAudioManager().closeAudioConnection();
-        guildService.getGuildAudioPlayer(messageEvent.getGuild()).getScheduler().clearQueue();
+        guildService.getGuildAudioPlayer(messageEvent.getGuild()).getScheduler().dispose();
     }
 
     @Override
     public String helpDescription() {
         return "*Manda o bot embora da sala\n*Tambem limpa a lista de musicas";
+    }
+
+    public enum Reason {
+        PAUSE,
+        STOP,
+        QUEUE_END,
+        LEFT_ALONE
     }
 
 }
