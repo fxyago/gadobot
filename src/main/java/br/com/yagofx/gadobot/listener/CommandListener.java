@@ -3,7 +3,6 @@ package br.com.yagofx.gadobot.listener;
 import br.com.yagofx.gadobot.commands.base.Command;
 import br.com.yagofx.gadobot.service.GuildService;
 import br.com.yagofx.gadobot.util.ParsingUtils;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -12,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -20,7 +20,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Component("CommandListener")
 public class CommandListener extends ListenerAdapter {
 
-    @Getter
     private static final HashMap<String, Command> COMMAND_MAP = new HashMap<>();
 
     private final GuildService guildService;
@@ -65,6 +64,10 @@ public class CommandListener extends ListenerAdapter {
     public static void addCommand(Command abstractCommand) {
         log.info("Adicionando comando: " + abstractCommand.name());
         abstractCommand.getAliases().forEach(s -> COMMAND_MAP.put(s, abstractCommand));
+    }
+
+    public static HashMap<String, Command> getCommandMap() {
+        return (HashMap<String, Command>) Collections.unmodifiableMap(COMMAND_MAP);
     }
 
 }
