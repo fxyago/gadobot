@@ -3,6 +3,7 @@ package br.com.yagofx.gadobot.player;
 import br.com.yagofx.gadobot.commands.player.Leave;
 import br.com.yagofx.gadobot.commands.player.Repeat;
 import br.com.yagofx.gadobot.service.YoutubeService;
+import br.com.yagofx.gadobot.util.PaginatedList;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -10,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Synchronized;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +36,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     final AudioPlayer audioPlayer;
 
-    final LinkedBlockingQueue<AudioTrackWrapper> queue;
+    final PaginatedList<AudioTrackWrapper> queue;
     final LinkedBlockingDeque<AudioTrackWrapper> history;
 
     final ScheduledExecutorService executor;
@@ -45,7 +47,7 @@ public class TrackScheduler extends AudioEventAdapter {
         this.youtubeService = youtubeService;
         this.audioPlayer = audioPlayer;
         this.history = new LinkedBlockingDeque<>();
-        this.queue = new LinkedBlockingQueue<>();
+        this.queue = new PaginatedList<>();
         this.nowPlaying = null;
         this.repeat = Repeat.LEVEL.NONE;
         this.executor = Executors.newSingleThreadScheduledExecutor();
@@ -79,7 +81,8 @@ public class TrackScheduler extends AudioEventAdapter {
         audioPlayer.startTrack(nextTrack.getTrack(), false);
     }
 
-    public synchronized void queue(AudioTrackWrapper newTrack) {
+    @Synchronized
+    public void queue(AudioTrackWrapper newTrack) {
         stopTimer();
         if (queue.isEmpty()) {
             nowPlaying = newTrack;
@@ -88,7 +91,8 @@ public class TrackScheduler extends AudioEventAdapter {
         queue.offer(newTrack);
     }
 
-    public synchronized void queueAll(List<AudioTrackWrapper> tracks) {
+    @Synchronized
+    public void queueAll(List<AudioTrackWrapper> tracks) {
         log.debug("Adding " + tracks.size() + " tracks to the queue");
         queue.addAll(tracks);
         if (audioPlayer.getPlayingTrack() == null) nextTrack();
@@ -191,7 +195,14 @@ public class TrackScheduler extends AudioEventAdapter {
         return audioPlayer.getVolume();
     }
 
-    public List<AudioTrackWrapper> getQueue() {
-        return List.copyOf(this.queue);
+    public PaginatedList<AudioTrackWrapper> getQueue() {
+        return this.queue;
+    }
+
+    public void jumpTo(int trackIndex) {
+        if (trackIndex >= queue.size()) throw new IndexOutOfBoundsException();
+
+        for (int i = 0; i < trackIndex - 1; i++) queue.poll();
+        nextTrack();
     }
 }
