@@ -2,6 +2,7 @@ package br.com.yagofx.gadobot.beans;
 
 import br.com.yagofx.gadobot.entity.DiscordCredentials;
 import br.com.yagofx.gadobot.entity.SpotifyCredentials;
+import br.com.yagofx.gadobot.listener.ButtonListener;
 import br.com.yagofx.gadobot.listener.CommandListener;
 import br.com.yagofx.gadobot.listener.GuildListener;
 import br.com.yagofx.gadobot.service.CredentialsService;
@@ -34,7 +35,8 @@ public class BeanFactory {
     @Bean
     public JDA buildJda(
             CommandListener commandListener,
-            GuildListener guildListener
+            GuildListener guildListener,
+            ButtonListener buttonListener
     ) {
         log.debug("Instanciando JDA...");
 
@@ -43,7 +45,7 @@ public class BeanFactory {
         return JDABuilder.createDefault(creds.getToken())
                 .setActivity(Activity.listening("seus pensamentos"))
                 .setEnabledIntents(EnumSet.allOf(GatewayIntent.class))
-                .addEventListeners(commandListener, guildListener)
+                .addEventListeners(commandListener, guildListener, buttonListener)
                 .build();
     }
 

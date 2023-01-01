@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(
-        basePackages = "br.com.yagofx.gadobot.commands",
+        basePackages = {
+                "br.com.yagofx.gadobot.commands",
+                "br.com.yagofx.gadobot.buttons"
+        },
         includeFilters = @ComponentScan.Filter(
                 InheritedComponent.class
         )
