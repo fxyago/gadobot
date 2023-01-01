@@ -20,7 +20,7 @@ public class Skip extends AbstractCommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("skip", "next", "jump", "n", "s");
+        return List.of("skip", "next", "n", "s");
     }
 
     @Override
