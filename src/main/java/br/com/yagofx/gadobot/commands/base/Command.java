@@ -2,7 +2,7 @@ package br.com.yagofx.gadobot.commands.base;
 
 import br.com.yagofx.gadobot.listener.CommandListener;
 import jakarta.annotation.PostConstruct;
-import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public interface Command {
         return List.of(this.getClass().getSimpleName().toLowerCase());
     }
 
-    void run(Event event);
+    void run(MessageReceivedEvent event);
 
     String helpDescription();
 
