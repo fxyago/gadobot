@@ -7,6 +7,10 @@ import java.util.List;
 
 public class ParsingUtils {
 
+    public static String[] extractPagesFrom(String footer) {
+        return footer.split(" ")[1].split("/");
+    }
+
     public static String extractCommandFrom(String message) {
         return message.substring(1).split(" ")[0];
     }
