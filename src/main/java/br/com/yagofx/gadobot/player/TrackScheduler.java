@@ -1,7 +1,7 @@
 package br.com.yagofx.gadobot.player;
 
-import br.com.yagofx.gadobot.commands.Leave;
-import br.com.yagofx.gadobot.commands.Repeat;
+import br.com.yagofx.gadobot.commands.player.Leave;
+import br.com.yagofx.gadobot.commands.player.Repeat;
 import br.com.yagofx.gadobot.service.YoutubeService;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -18,9 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static br.com.yagofx.gadobot.commands.Leave.Reason.*;
+import static br.com.yagofx.gadobot.commands.player.Leave.Reason.*;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -192,7 +191,7 @@ public class TrackScheduler extends AudioEventAdapter {
         return audioPlayer.getVolume();
     }
 
-    public List<String> getTracklist() {
-        return this.queue.stream().map(AudioTrackWrapper::getSongName).collect(Collectors.toList());
+    public List<AudioTrackWrapper> getQueue() {
+        return List.copyOf(this.queue);
     }
 }

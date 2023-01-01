@@ -42,7 +42,6 @@ public class DelegatePlayHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private void queue(List<AudioTrackWrapper> tracks, Event event) {

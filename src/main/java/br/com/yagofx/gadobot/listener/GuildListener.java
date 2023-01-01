@@ -1,6 +1,6 @@
 package br.com.yagofx.gadobot.listener;
 
-import br.com.yagofx.gadobot.commands.Leave;
+import br.com.yagofx.gadobot.commands.player.Leave;
 import br.com.yagofx.gadobot.service.GuildService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
