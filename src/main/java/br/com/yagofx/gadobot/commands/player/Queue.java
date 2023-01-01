@@ -5,7 +5,6 @@ import br.com.yagofx.gadobot.buttons.queue.LastPage;
 import br.com.yagofx.gadobot.buttons.queue.NextPage;
 import br.com.yagofx.gadobot.buttons.queue.PreviousPage;
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
-import br.com.yagofx.gadobot.player.AudioTrackWrapper;
 import br.com.yagofx.gadobot.service.GuildService;
 import br.com.yagofx.gadobot.util.SimpleEmbeds;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -33,12 +32,13 @@ public class Queue extends AbstractCommand {
 
     @Override
     public void run(MessageReceivedEvent messageEvent) {
-        final List<AudioTrackWrapper> queue = guildService.getTrackScheduler(messageEvent.getGuild()).getQueue();
+        final var queue = guildService.getTrackScheduler(messageEvent.getGuild()).getQueue();
+        if (queue.isEmpty()) {
+            messageEvent.getChannel().sendMessageEmbeds(SimpleEmbeds.notification("A fila de músicas está vazia", null).build()).queue();
+            return;
+        }
 
-        final int currentPage = 0;
-        final int totalPages = Math.floorDiv(queue.size(), 10);
-
-        MessageEmbed embed = SimpleEmbeds.songList(queue.subList(0, 9), currentPage, totalPages).build();
+        MessageEmbed embed = SimpleEmbeds.songList(queue.getFirstPage(), 1, ((int) Math.ceil(queue.size() / 10d))).build();
 
         messageEvent.getChannel().sendMessageEmbeds(embed).addActionRow(
                 Button.danger(FirstPage.class.getSimpleName(), Emoji.fromFormatted("<:first:901482748957585478>")),

@@ -12,12 +12,12 @@ public class SimpleEmbeds {
     }
 
     public static EmbedBuilder songList(List<AudioTrackWrapper> queue, int currentPage, int totalPages) {
-        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Lista de músicas:").setFooter(String.format("Página %s/%s", currentPage + 1, totalPages + 1));
+        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Lista de músicas:").setFooter(String.format("Página %s/%s", currentPage, totalPages));
         StringBuilder sb = new StringBuilder();
 
-        int trackIndex = 1 + 10 * currentPage;
-        for (; trackIndex < 10; trackIndex++)
-            sb.append(String.format("%s - %s", trackIndex, queue.get(trackIndex).getSongName()));
+        int trackIndex = 1 + (10 * (currentPage - 1));
+        for (int i = 0; i < queue.size(); trackIndex++, i ++)
+            sb.append(String.format("%s - %s\n", trackIndex, queue.get(i).getSongName()));
 
         return embedBuilder.setDescription(sb.toString().trim());
     }

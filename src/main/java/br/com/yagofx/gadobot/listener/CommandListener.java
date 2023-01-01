@@ -61,9 +61,9 @@ public class CommandListener extends ListenerAdapter {
         event.getChannel().sendMessage("Muuuuuuuu").queueAfter(1500, MILLISECONDS);
     }
 
-    public static void addCommand(Command abstractCommand) {
-        log.info("Adicionando comando: " + abstractCommand.name());
-        abstractCommand.getAliases().forEach(s -> COMMAND_MAP.put(s, abstractCommand));
+    public static void addCommand(Command command) {
+        log.info("Adicionando comando: " + command.name());
+        command.getAliases().forEach(s -> COMMAND_MAP.put(s, command));
     }
 
     public static HashMap<String, Command> getCommandMap() {
