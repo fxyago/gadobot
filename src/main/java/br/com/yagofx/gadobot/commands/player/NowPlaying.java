@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class NowPlaying extends AbstractCommand {
 
@@ -35,7 +34,7 @@ public class NowPlaying extends AbstractCommand {
             messageEvent.getChannel().sendMessage("Tem nada tocando agora nao bro").queue();
         } else {
             messageEvent.getMessage().addReaction(CommonEmojis.THUMBS_UP).queue();
-            messageEvent.getChannel().sendMessageEmbeds(montarEmbedDe(nowPlaying)).queueAfter(2, TimeUnit.SECONDS);
+            messageEvent.getChannel().sendMessageEmbeds(montarEmbedDe(nowPlaying)).queue();
         }
     }
 
