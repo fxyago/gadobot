@@ -1,8 +1,7 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.player;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -22,12 +21,9 @@ public class Summon extends AbstractCommand {
     }
 
     @Override
-    public void run(Event event) {
-        var messageEvent = (MessageReceivedEvent) event;
-
+    public void run(MessageReceivedEvent messageEvent) {
         if (!service.connectToVoiceChannel(messageEvent.getGuild(), messageEvent.getMember()))
             messageEvent.getChannel().sendMessage("Entra numa sala primeiro krl").queue();
-
     }
 
     @Override

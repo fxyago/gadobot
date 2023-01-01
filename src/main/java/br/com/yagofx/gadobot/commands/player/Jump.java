@@ -1,7 +1,7 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.player;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
-import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ public class Jump extends AbstractCommand {
     }
 
     @Override
-    public void run(Event event) {
+    public void run(MessageReceivedEvent messageEvent) {
 
     }
 

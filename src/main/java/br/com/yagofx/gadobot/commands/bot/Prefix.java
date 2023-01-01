@@ -1,10 +1,9 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.bot;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.impl.GuildServiceImpl;
 import br.com.yagofx.gadobot.util.ParsingUtils;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -20,8 +19,7 @@ public class Prefix extends AbstractCommand {
     }
 
     @Override
-    public void run(Event event) {
-        MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
+    public void run(MessageReceivedEvent messageEvent) {
         String message = String.format("Prefixo atual: `%s`", guildServiceImpl.getPrefix(messageEvent.getGuild().getId()));
         try {
             String args = ParsingUtils.extractArgsFrom(messageEvent.getMessage().getContentRaw());

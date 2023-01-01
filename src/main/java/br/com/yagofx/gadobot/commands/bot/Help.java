@@ -1,4 +1,4 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.bot;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.commands.base.Command;
@@ -7,7 +7,6 @@ import br.com.yagofx.gadobot.util.ParsingUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class Help extends AbstractCommand {
 
     @Override
-    public void run(Event event) {
-        MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
+    public void run(MessageReceivedEvent messageEvent) {
         TextChannel channel = messageEvent.getChannel().asTextChannel();
 
         Command command;
@@ -28,7 +26,7 @@ public class Help extends AbstractCommand {
         try {
             String args = ParsingUtils.extractArgsFrom(messageEvent.getMessage().getContentRaw());
 
-            command = CommandListener.getCOMMAND_MAP().get(args);
+            command = CommandListener.getCommandMap().get(args);
             if (command == null) {
                 channel.sendTyping().queue();
                 channel.sendMessage("Nao achei esse comando ai, vc escreveu esse treco certo parsa?").queueAfter(1000, TimeUnit.SECONDS);
@@ -41,7 +39,7 @@ public class Help extends AbstractCommand {
                 command.helpDescription(), channel);
 
         } catch (IndexOutOfBoundsException ioobe) {
-            List<String> commands = new HashSet<>(CommandListener.getCOMMAND_MAP().values()).stream().map(c -> c.name().toLowerCase()).toList();
+            List<String> commands = new HashSet<>(CommandListener.getCommandMap().values()).stream().map(c -> c.name().toLowerCase()).toList();
 
             this.sendHelpDefinition(new EmbedBuilder()
                     .setAuthor("Comandos disponiveis: "),

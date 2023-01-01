@@ -1,11 +1,10 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.player;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
 import br.com.yagofx.gadobot.util.CommonEmojis;
 import br.com.yagofx.gadobot.util.ParsingUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -24,8 +23,7 @@ public class Repeat extends AbstractCommand {
     }
 
     @Override
-    public void run(Event event) {
-        MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
+    public void run(MessageReceivedEvent messageEvent) {
         String args = null;
         try {
             args = ParsingUtils.extractArgsFrom(messageEvent.getMessage().getContentRaw());

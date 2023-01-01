@@ -1,9 +1,8 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.player;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.handlers.DelegatePlayHandler;
 import br.com.yagofx.gadobot.util.CommonEmojis;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -22,8 +21,7 @@ public class Play extends AbstractCommand {
     }
 
     @Override
-    public void run(Event event) {
-        var messageEvent = (MessageReceivedEvent) event;
+    public void run(MessageReceivedEvent messageEvent) {
         messageEvent.getMessage().addReaction(CommonEmojis.THUMBS_UP).queue();
         handler.loadAndPlayFrom(messageEvent);
     }

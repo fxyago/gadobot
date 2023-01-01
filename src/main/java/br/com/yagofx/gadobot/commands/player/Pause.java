@@ -1,19 +1,18 @@
-package br.com.yagofx.gadobot.commands;
+package br.com.yagofx.gadobot.commands.player;
 
 import br.com.yagofx.gadobot.commands.base.AbstractCommand;
 import br.com.yagofx.gadobot.service.GuildService;
 import br.com.yagofx.gadobot.util.CommonEmojis;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.List;
 
-public class Skip extends AbstractCommand {
+public class Pause extends AbstractCommand {
 
     private final GuildService guildService;
 
-    public Skip(
+    public Pause(
             @Qualifier("GuildServiceImpl")
             GuildService guildService) {
         this.guildService = guildService;
@@ -21,19 +20,19 @@ public class Skip extends AbstractCommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("skip", "next", "jump", "n", "s");
+        return List.of("pause");
     }
 
     @Override
-    public void run(Event event) {
-        MessageReceivedEvent messageEvent = (MessageReceivedEvent) event;
-        messageEvent.getMessage().addReaction(CommonEmojis.NEXT_TRACK).queue();
-        guildService.getTrackScheduler(messageEvent.getGuild()).nextTrack();
+    public void run(MessageReceivedEvent messageEvent) {
+        var scheduler = guildService.getTrackScheduler(messageEvent.getGuild());
+        boolean paused = scheduler.isPaused();
+        messageEvent.getMessage().addReaction(paused ? CommonEmojis.PLAY : CommonEmojis.PAUSE).queue();
+        scheduler.togglePause();
     }
 
     @Override
     public String helpDescription() {
-        return "* Pula para a próxima música da fila\n* Para o player caso a fila esteja vazia";
+        return "* Pausa/resume o player de música";
     }
-
 }
