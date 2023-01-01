@@ -25,6 +25,7 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     public static void addButton(Button button) {
+        log.info("Adicionando botao: " + button.name());
         BUTTONS_MAP.put(button.name(), button);
     }
 
